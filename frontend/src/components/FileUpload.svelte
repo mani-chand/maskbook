@@ -8,4 +8,4 @@
   };
 </script>
 
-<Fileupload bind:files={newPost.file} {...fileuploadprops} />
+<Fileupload bind:files={newPost.fileData} {...fileuploadprops} />

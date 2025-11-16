@@ -8,7 +8,7 @@
     mobile: "",
     password: "",
     confirmPassword: "",
-    file: null,
+    fileData: null,
   });
 </script>
 

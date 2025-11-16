@@ -12,10 +12,10 @@
   };
   let newPost = $state({
     message: "",
-    file: null,
+    fileData: null,
   });
   const createPost = () => {
-    CreateNewPost(newPost?.message, newPost?.file);
+    CreateNewPost(newPost?.message, newPost?.fileData);
   };
 </script>
 

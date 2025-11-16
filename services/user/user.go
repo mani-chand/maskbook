@@ -47,12 +47,12 @@ func ValidateUser(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(existingUser.PasswordHash), []byte(input.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(input.Password))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
-	existingUser.PasswordHash = ""
+	existingUser.Password = ""
 	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "user": existingUser})
 }
 
@@ -147,7 +147,7 @@ func CreateUser(c *gin.Context) {
 	// (You should also check for existing email)
 
 	// 2. Hash the password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.PasswordHash), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
@@ -188,12 +188,12 @@ func CreateUser(c *gin.Context) {
 
 	// 3. Create a new user object
 	newUser := usermodels.User{
-		ID:           primitive.NewObjectID(), // Generate a new BSON ObjectID
-		Username:     input.Username,
-		Email:        input.Email,
-		PasswordHash: string(hashedPassword), // Use "PasswordHash", not "Password"
-		Mobile:       input.Mobile,
-		Avatar:       fileURL, // Initialize new Avatar field as empty
+		ID:       primitive.NewObjectID(), // Generate a new BSON ObjectID
+		Username: input.Username,
+		Email:    input.Email,
+		Password: string(hashedPassword), // Use "Password", not "Password"
+		Mobile:   input.Mobile,
+		Avatar:   fileURL, // Initialize new Avatar field as empty
 	}
 
 	// 4. Insert the new user into the database

@@ -15,8 +15,8 @@ type User struct {
 	Username string             `json:"username" bson:"username"`
 	Email    string             `json:"email"    bson:"email"`
 	// 2. Make sure this field is for the hash, not plain text
-	PasswordHash string `json:"-"        bson:"password_hash"` // Never send password to client
-	Mobile       string `json:"mobile"   bson:"mobile"`
+	Password string `json:"-"        bson:"password"` // Never send password to client
+	Mobile   string `json:"mobile"   bson:"mobile"`
 	// 3. Added the new Avatar field with corrected tags
 	Avatar   string `json:"avatar"   bson:"avatar,omitempty"`
 	FileData string `json:"fileData"`

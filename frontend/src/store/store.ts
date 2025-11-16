@@ -18,7 +18,7 @@ export interface SignupForm {
   password: string;
   confirmPassword: string;
   // This is the correct type for "null or a single file"
-  file: File | null;
+  fileData: File | null;
 }
 
 /**
@@ -27,7 +27,7 @@ export interface SignupForm {
 export interface Post {
   id: string;
   message: string;
-  file: FileList | null; // Optional file URL
+  fileData: FileList | null; // Optional file URL
   user_id: string;
   created_at: string; // Typically an ISO string
   user?: User; // Optional: Include full user details
@@ -38,7 +38,7 @@ export interface Post {
  */
 export interface NewPostForm {
   message: string;
-  file: FileList | null; // The FileList from the <Fileupload> component
+  fileData: FileList | null; // The FileList from the <Fileupload> component
 }
 
 // --- Store Definitions ---
@@ -54,7 +54,7 @@ export const posts: Writable<Post[]> = writable([]);
  */
 export const newPost: Writable<NewPostForm> = writable({
   message: "",
-  file: null,
+  file: FileList | null,
 });
 
 /**
