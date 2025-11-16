@@ -1,5 +1,3 @@
-Here is a new README tailored to your project "MaskBook" using Svelte and Go.
-
 -----
 
 # 🎭 MaskBook
