@@ -19,10 +19,10 @@
   </NavBrand>
   <NavHamburger />
   <NavUl>
-    <NavLi href="/">Login</NavLi>
-    <NavLi href="/docs/components/navbar">Logout</NavLi>
-    <NavLi href="/docs/components/accordion">create an account</NavLi>
-    <NavLi href="/docs/components/alert">chat</NavLi>
-    <NavLi href="/docs/components/avatar">profile</NavLi>
+    <NavLi href="/login">Login</NavLi>
+    <NavLi href="">Logout</NavLi>
+    <NavLi href="/create">create an account</NavLi>
+    <NavLi href="/chat">chat</NavLi>
+    <NavLi href="/profile/1/">profile</NavLi>
   </NavUl>
 </Navbar>
