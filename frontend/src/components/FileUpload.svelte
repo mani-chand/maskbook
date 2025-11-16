@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { Fileupload } from "flowbite-svelte";
+  import { Fileupload, label } from "flowbite-svelte";
 
+  let { newPost = $bindable() } = $props();
   let fileuploadprops = {
     id: "user_avatar",
+    label: "Upload file",
   };
 </script>
 
-<Fileupload {...fileuploadprops} />
+<Fileupload bind:files={newPost.file} {...fileuploadprops} />
