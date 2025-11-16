@@ -11,6 +11,15 @@ export interface User {
   avatar_url?: string; // Optional avatar
   // Add other user fields as needed
 }
+export interface SignupForm {
+  username: string;
+  email: string;
+  mobile: string;
+  password: string;
+  confirmPassword: string;
+  // This is the correct type for "null or a single file"
+  file: File | null;
+}
 
 /**
  * Represents a Post object as it's stored in the database.

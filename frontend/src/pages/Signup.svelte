@@ -1,12 +1,14 @@
 <script lang="ts">
   import { Input, Label, Button, Checkbox, A } from "flowbite-svelte";
   import FileUpload from "../components/FileUpload.svelte";
+  import { CreateUser } from "./../services/createUser";
   let newUser = $state({
     username: "",
     email: "",
     mobile: "",
     password: "",
     confirmPassword: "",
+    file: null,
   });
 </script>
 
@@ -60,7 +62,7 @@
     </div>
     <div class="mb-6">
       <Label>Profile Picture</Label>
-      <FileUpload bind:newPost={newUser} />
+      <FileUpload multiple={false} bind:newPost={newUser} />
     </div>
     <Checkbox classes={{ div: "mb-6 gap-1 rtl:space-x-reverse" }} required>
       I agree with the <A
@@ -69,6 +71,11 @@
         >terms and conditions</A
       >.
     </Checkbox>
-    <Button type="submit">Signup</Button>
+    <Button
+      onclick={() => {
+        CreateUser(newUser);
+      }}
+      type="submit">Signup</Button
+    >
   </form>
 </main>

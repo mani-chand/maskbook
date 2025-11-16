@@ -18,5 +18,6 @@ type User struct {
 	PasswordHash string `json:"-"        bson:"password_hash"` // Never send password to client
 	Mobile       string `json:"mobile"   bson:"mobile"`
 	// 3. Added the new Avatar field with corrected tags
-	Avatar string `json:"avatar"   bson:"avatar,omitempty"`
+	Avatar   string `json:"avatar"   bson:"avatar,omitempty"`
+	FileData string `json:"fileData"`
 }

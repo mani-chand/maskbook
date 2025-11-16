@@ -1,7 +1,12 @@
 package user
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
+	"errors"
+	"strings"
+
 	// "errors"
 	"log"
 	"net/http"
@@ -10,11 +15,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/internal/uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	// 1. THIS IS THE CORRECT IMPORT.
 	// It must match the import in main.go
 	"noob/services/database"
+	"noob/services/storage"
 
 	// 2. Use an alias for your models
 	usermodels "noob/models/user"
@@ -49,10 +56,71 @@ func ValidateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "user": existingUser})
 }
 
+// decodeBase64File is a helper function to strip the prefix
+// (e.g., "data:image/png;base64,") and decode the data.
+func decodeBase64File(dataURL string) ([]byte, error) {
+	// Find the comma
+	commaIndex := strings.Index(dataURL, ",")
+	if commaIndex == -1 {
+		return nil, errors.New("invalid base64 data URL: missing comma")
+	}
+
+	// Get the part after the comma
+	base64Data := dataURL[commaIndex+1:]
+
+	// Decode the string
+	decoded, err := base64.StdEncoding.DecodeString(base64Data)
+	if err != nil {
+		return nil, errors.New("failed to decode base64 data")
+	}
+	return decoded, nil
+}
+
+// --- HELPER FUNCTIONS ---
+
+// getMimeType parses the data URL (e.g., "data:image/png;base64,...")
+// and returns the MIME type (e.g., "image/png")
+func getMimeType(dataURL string) (string, error) {
+	// Find "data:"
+	startIndex := strings.Index(dataURL, "data:")
+	if startIndex == -1 {
+		return "", errors.New("invalid data URL: missing 'data:' prefix")
+	}
+	// Find ";base64,"
+	endIndex := strings.Index(dataURL, ";base64,")
+	if endIndex == -1 {
+		return "", errors.New("invalid data URL: missing ';base64,' separator")
+	}
+
+	// The MIME type is between "data:" and ";base64,"
+	mimeType := dataURL[startIndex+5 : endIndex]
+	return mimeType, nil
+}
+
+// mimeTypeToExtension maps a MIME type to a file extension.
+// Add any other file types you want to support here.
+func mimeTypeToExtension(mimeType string) (string, error) {
+	switch mimeType {
+	case "image/jpeg":
+		return ".jpg", nil
+	case "image/png":
+		return ".png", nil
+	case "image/gif":
+		return ".gif", nil
+	case "video/mp4":
+		return ".mp4", nil
+	case "video/quicktime":
+		return ".mov", nil
+	default:
+		return "", errors.New("unsupported file type: " + mimeType)
+	}
+}
+
 // CreateUser handles the logic for creating a new user.
 func CreateUser(c *gin.Context) {
 	// BUG FIX 1: Bind to AuthInput to get the plain-text password
 	var input usermodels.User
+	fileURL := ""
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
@@ -84,6 +152,39 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
 	}
+	if input.FileData != "" {
+		mimeType, err := getMimeType(input.FileData)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// 2. Get the correct file extension (e.g., ".jpg")
+		extension, err := mimeTypeToExtension(mimeType)
+		if err != nil {
+			// This means the user uploaded an unsupported file type
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// 3. Decode the data
+		fileData, err := decodeBase64File(input.FileData)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// 4. Create the new, correct filename
+		filename := uuid.New().String() + extension
+		fileURL, err = storage.UploadFile(filename, bytes.NewReader(fileData))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file"})
+			return
+		}
+		log.Println("File uploaded to S3:", fileURL)
+	} else {
+		log.Println("No file data was sent with this post.")
+	}
 
 	// 3. Create a new user object
 	newUser := usermodels.User{
@@ -92,7 +193,7 @@ func CreateUser(c *gin.Context) {
 		Email:        input.Email,
 		PasswordHash: string(hashedPassword), // Use "PasswordHash", not "Password"
 		Mobile:       input.Mobile,
-		Avatar:       "", // Initialize new Avatar field as empty
+		Avatar:       fileURL, // Initialize new Avatar field as empty
 	}
 
 	// 4. Insert the new user into the database

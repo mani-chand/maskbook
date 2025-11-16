@@ -23,7 +23,7 @@
   <div style="width: 80%;display:flex;flex-direction:column;margin:0 auto;">
     <Label style="font-size: large;">Create a Post</Label>
     <Textarea {...textareaprops} bind:value={newPost.message} class="w-full" />
-    <FileUpload bind:newPost />
+    <FileUpload multiple={true} bind:newPost />
     <Button
       class="cursor-pointer"
       onclick={createPost}
