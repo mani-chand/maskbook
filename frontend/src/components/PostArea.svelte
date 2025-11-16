@@ -12,7 +12,6 @@
   let newPost = $state({
     message: "",
   });
-
   const createPost = () => {};
 </script>
 
