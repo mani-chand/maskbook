@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
+
+	// We no longer need "strings" for the old FileServer
+	// "strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -19,9 +21,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	// Set up CORS.
-	// This is good practice for your API, even in production.
-	// You can be more restrictive here if you want.
+	// Set up CORS
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"}, // Allow all origins
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -38,16 +38,30 @@ func main() {
 	})
 
 	// === Frontend (Svelte) Serving ===
-	// Set the path to your built Svelte app
-	// Updated to 'frontend/dist' to match your plain Vite setup
-	staticDir := "frontend/dist" 
-	
-	// 1. Serve static files (JS, CSS, images, etc.)
-	FileServer(r, "/", http.Dir(staticDir))
 
-	// 2. Serve the index.html for any other route to support
-	// Svelte's client-side routing
-	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+	staticDir := "frontend/dist"
+
+	// Create a file server handler for the static directory
+	fileServer := http.FileServer(http.Dir(staticDir))
+
+	// Use a custom handler to serve files and fallback to index.html
+	// This is the new, correct logic for a Single Page App (SPA)
+	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+		// Get the path to the requested file
+		filePath := filepath.Join(staticDir, r.URL.Path)
+
+		// Check if a file exists at that path
+		// e.g., /assets/index-123.js
+		stat, err := os.Stat(filePath)
+
+		// If the file exists and is not a directory, serve it
+		if err == nil && !stat.IsDir() {
+			fileServer.ServeHTTP(w, r)
+			return
+		}
+
+		// If the file does NOT exist (e.g., /create, /login),
+		// serve the index.html
 		http.ServeFile(w, r, filepath.Join(staticDir, "index.html"))
 	})
 
@@ -69,28 +83,4 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(response))
 }
 
-// FileServer conveniently serves static files and handles SPA (Single Page App)
-// routing.
-func FileServer(r chi.Router, public string, static http.Dir) {
-	if strings.ContainsAny(public, "{}*") {
-		panic("FileServer does not permit URL parameters.")
-	}
-
-	root, _ := filepath.Abs(string(static))
-	if _, err := os.Stat(root); os.IsNotExist(err) {
-		log.Printf("Static directory %s does not exist. Your Svelte app may not be built.", root)
-	}
-
-	fs := http.StripPrefix(public, http.FileServer(http.Dir(root)))
-
-	if public != "/" && public[len(public)-1] != '/' {
-		// Use the explicit 301 status code instead of the constant
-		r.Get(public, http.RedirectHandler(public+"/", 301).ServeHTTP)
-		public += "/"
-	}
-	public += "*"
-
-	r.Get(public, func(w http.ResponseWriter, r *http.Request) {
-		fs.ServeHTTP(w, r)
-	})
-}
+// The old, problematic FileServer function has been removed.
