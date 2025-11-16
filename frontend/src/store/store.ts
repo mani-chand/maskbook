@@ -18,7 +18,7 @@ export interface User {
 export interface Post {
   id: string;
   message: string;
-  file_url?: string; // Optional file URL
+  file: FileList | null; // Optional file URL
   user_id: string;
   created_at: string; // Typically an ISO string
   user?: User; // Optional: Include full user details

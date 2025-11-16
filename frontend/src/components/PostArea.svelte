@@ -2,6 +2,7 @@
   import FileUpload from "../components/FileUpload.svelte";
   import { Label, Textarea } from "flowbite-svelte";
   import { Button } from "flowbite-svelte";
+  import { CreateNewPost } from "./../services/CreatePost";
   let textareaprops = {
     id: "message",
     name: "message",
@@ -11,8 +12,11 @@
   };
   let newPost = $state({
     message: "",
+    file: null,
   });
-  const createPost = () => {};
+  const createPost = () => {
+    CreateNewPost(newPost?.message, newPost?.file);
+  };
 </script>
 
 <main>
