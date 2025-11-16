@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { Input, Label, Button, Checkbox, A, Heading } from "flowbite-svelte";
+  import { Input, Label, Button, Checkbox, A } from "flowbite-svelte";
+  let userLogin = $state({
+    username: "",
+    password: "",
+  });
 </script>
 
 <main
@@ -8,12 +12,24 @@
   <form style="margin-top: 20px;">
     <div class="mb-6 grid gap-6 md:grid-cols-1">
       <div>
-        <Label for="first_name" class="mb-2">Username</Label>
-        <Input type="text" id="first_name" placeholder="John" required />
+        <Label for="username" class="mb-2">Username</Label>
+        <Input
+          bind:value={userLogin.username}
+          type="text"
+          id="username"
+          placeholder="John"
+          required
+        />
       </div>
       <div class="mb-6">
         <Label for="password" class="mb-2">Password</Label>
-        <Input type="password" id="password" placeholder="•••••••••" required />
+        <Input
+          bind:value={userLogin.password}
+          type="password"
+          id="password"
+          placeholder="•••••••••"
+          required
+        />
       </div>
       <Checkbox classes={{ div: "mb-6 gap-1 rtl:space-x-reverse" }} required>
         I agree with the <A

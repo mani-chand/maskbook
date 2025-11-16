@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Fileupload, label } from "flowbite-svelte";
+  import { Fileupload } from "flowbite-svelte";
 
   let { newPost = $bindable() } = $props();
   let fileuploadprops = {

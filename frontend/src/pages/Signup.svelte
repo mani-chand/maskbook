@@ -1,13 +1,27 @@
 <script lang="ts">
-  import { Input, Label, Button, Checkbox, A, Heading } from "flowbite-svelte";
+  import { Input, Label, Button, Checkbox, A } from "flowbite-svelte";
+  import FileUpload from "../components/FileUpload.svelte";
+  let newUser = $state({
+    username: "",
+    email: "",
+    mobile: "",
+    password: "",
+    confirmPassword: "",
+  });
 </script>
 
 <main style="width: 70%;display:flex;flex-direction:column;margin:0 auto;">
   <form style="margin-top: 20px;">
     <div class="mb-6 grid gap-6 md:grid-cols-2">
       <div>
-        <Label for="first_name" class="mb-2">Username</Label>
-        <Input type="text" id="first_name" placeholder="John" required />
+        <Label for="username" class="mb-2">Username</Label>
+        <Input
+          bind:value={newUser.username}
+          type="text"
+          id="username"
+          placeholder="John"
+          required
+        />
       </div>
       <div>
         <Label for="email" class="mb-2">Email address</Label>
@@ -16,6 +30,7 @@
           id="email"
           placeholder="john.doe@company.com"
           required
+          bind:value={newUser.email}
         />
       </div>
     </div>
@@ -24,9 +39,9 @@
       <Input
         type="tel"
         id="phone"
-        placeholder="123-45-678"
-        pattern={"[0-9]{3}-[0-9]{2}-[0-9]{3}"}
+        placeholder="+1 12345678"
         required
+        bind:value={newUser.password}
       />
     </div>
     <div class="mb-6">
@@ -40,7 +55,12 @@
         id="confirm_password"
         placeholder="•••••••••"
         required
+        bind:value={newUser.confirmPassword}
       />
+    </div>
+    <div class="mb-6">
+      <Label>Profile Picture</Label>
+      <FileUpload bind:newPost={newUser} />
     </div>
     <Checkbox classes={{ div: "mb-6 gap-1 rtl:space-x-reverse" }} required>
       I agree with the <A
