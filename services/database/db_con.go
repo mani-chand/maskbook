@@ -43,9 +43,6 @@ func ConnectDB() {
 
 	// 5. Store the database instance for other packages to use
 	dbName := os.Getenv("MONGODB_NAME")
-	if dbName == "" {
-		dbName = "noob_db" // Add a sensible default
-	}
 	db = client.Database(dbName)
 }
 

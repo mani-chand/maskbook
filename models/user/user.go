@@ -6,12 +6,9 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 // ... (this struct is fine)
 type AuthInput struct {
 	Username string `json:"username" binding:"required"`
-	Email    string `json:"email"    binding:"required"`
 	Password string `json:"password" binding:"required"`
-	Mobile   string `json:"mobile"   binding:"required"`
 }
 
-// User defines the model for a user, updated for MongoDB.
 type User struct {
 	// 1. Use primitive.ObjectID for MongoDB's native _id
 	ID       primitive.ObjectID `json:"id"       bson:"_id,omitempty"`

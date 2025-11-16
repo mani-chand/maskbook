@@ -10,16 +10,34 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv" // 1. Import godotenv
 
-	// 1. Import your local 'services' package
-	// Make sure "noob" is your module name from go.mod
+	// 2. THIS IS THE CORRECT IMPORT.
+	"noob/services/database"
+
 	"noob/services/post"
-	services "noob/services/user"
+	"noob/services/storage"
+	"noob/services/user"
 )
 
-// 2. The 'authInput' struct has been moved to services/user.go
+func loadEnv() {
+	// Load .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found, using environment variables")
+	}
+}
 
 func main() {
+	// 3. Load environment variables first
+	loadEnv()
+
+	// 4. Connect to the database using the correct package
+	database.ConnectDB()
+
+	// 5. Initialize S3 Client
+	storage.InitS3()
+
 	// gin.Default() comes with Logger and Recoverer middleware
 	r := gin.Default()
 
@@ -34,16 +52,16 @@ func main() {
 	// Mount your API routes under /api
 	api := r.Group("/api")
 	{
-		// I've added GetPostsHandler back in so this route works
-		// 3. Call the EXPORTED (capitalized) functions
-		api.POST("/createUser", services.CreateUser)
-		api.POST("/login", services.ValidateUser)
+		// Call the functions from their correct packages
 		api.GET("/posts", post.Get_all_posts)
-		api.POST("/post", post.Create_post)
-		// r.Get("/user/{userID}", GetUserHandler)
+		api.POST("/createUser", user.CreateUser)
+		api.POST("/login", user.ValidateUser)
+		api.POST("/createPost", post.Create_post)
+		// You will add your post creation route here later
+		// e.g., api.POST("/createPost", post.CreatePost)
 	}
 
-	// === Frontend (Svelte) Serving ===
+	// === Frontend (SVvelte) Serving ===
 	staticDir := "frontend/dist"
 
 	// Check if static dir exists
@@ -52,12 +70,9 @@ func main() {
 	}
 
 	// This middleware serves files from the static dir.
-	// If a file is found (e.g., /assets/index-123.js), it serves it.
-	// If not, it passes control to the next handler (e.g., NoRoute).
 	r.Use(static.Serve("/", static.LocalFile(staticDir, false)))
 
 	// Fallback for SPA (Single Page App)
-	// If no file or API route is matched, serve index.html
 	r.NoRoute(func(c *gin.Context) {
 		// Don't serve index.html for API calls that 404
 		if strings.HasPrefix(c.Request.URL.Path, "/api") {
@@ -76,21 +91,7 @@ func main() {
 	})
 
 	log.Println("Starting server on :8080...")
-	// Use r.Run() which is Gin's equivalent of http.ListenAndServe
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Could not start server: %s\n", err)
 	}
-}
-
-// GetPostsHandler is a sample API handler, updated for Gin
-// (I've added this back from our previous version so the route works)
-func GetPostsHandler(c *gin.Context) {
-	// In a real app, you'd fetch this from your database
-	response := `[
-		{"id": "1", "message": "Hello from your Go backend!"},
-		{"id": "2", "message": "Svelte and Go are a great combo!"}
-	]`
-
-	// c.Data sends raw bytes. It's equivalent to w.Write()
-	c.Data(http.StatusOK, "application/json", []byte(response))
 }

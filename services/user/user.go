@@ -52,7 +52,7 @@ func ValidateUser(c *gin.Context) {
 // CreateUser handles the logic for creating a new user.
 func CreateUser(c *gin.Context) {
 	// BUG FIX 1: Bind to AuthInput to get the plain-text password
-	var input usermodels.AuthInput
+	var input usermodels.User
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
@@ -79,7 +79,7 @@ func CreateUser(c *gin.Context) {
 	// (You should also check for existing email)
 
 	// 2. Hash the password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.PasswordHash), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
