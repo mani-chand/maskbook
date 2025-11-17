@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Input, Label, Button, Checkbox, A } from "flowbite-svelte";
+  import { ValidateUser } from "./../services/ValidateUser";
   let userLogin = $state({
     username: "",
     password: "",
@@ -27,7 +28,7 @@
           bind:value={userLogin.password}
           type="password"
           id="password"
-          placeholder="•••••••••"
+          placeholder="Enter Your Security key"
           required
         />
       </div>
@@ -38,7 +39,13 @@
           >terms and conditions</A
         >.
       </Checkbox>
-      <Button type="submit">Signin</Button>
+      <Button
+        onclick={(e) => {
+          e.preventDefault();
+          ValidateUser(userLogin);
+        }}
+        type="submit">Signin</Button
+      >
     </div>
   </form>
 </main>

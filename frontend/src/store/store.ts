@@ -5,10 +5,18 @@ import { writable, type Writable } from 'svelte/store';
 /**
  * Represents a User object.
  */
+
+export interface loginForm {
+  username:string,
+  password:string
+}
+
 export interface User {
   id: string;
   username: string;
-  avatar_url?: string; // Optional avatar
+  avatar?: string; // Optional avatar
+  email:string;
+  mobile:string;
   // Add other user fields as needed
 }
 export interface SignupForm {

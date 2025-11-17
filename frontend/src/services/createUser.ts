@@ -51,7 +51,7 @@ export const CreateUser = async (newUser: SignupForm) => {
       },
     });
     console.log('User creation successful:', res.data);
-    window.location.assign('/login')
+    // window.location.assign('/login')
     // You could add a redirect here on success
     // e.g., navigate('/login');
   } catch (err: any) {

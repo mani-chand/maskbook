@@ -28,6 +28,14 @@ import (
 	usermodels "noob/models/user"
 )
 
+type SignupInput struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Mobile   string `json:"mobile"`
+	FileData string `json:"fileData"`
+}
+
 // ValidateUser checks if a user's credentials are correct.
 func ValidateUser(c *gin.Context) {
 	var input usermodels.AuthInput
@@ -120,7 +128,7 @@ func mimeTypeToExtension(mimeType string) (string, error) {
 // CreateUser handles the logic for creating a new user.
 func CreateUser(c *gin.Context) {
 	// BUG FIX 1: Bind to AuthInput to get the plain-text password
-	var input usermodels.User
+	var input SignupInput
 	fileURL := ""
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -148,7 +156,7 @@ func CreateUser(c *gin.Context) {
 	// (You should also check for existing email)
 
 	// 2. Hash the password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
@@ -191,14 +199,13 @@ func CreateUser(c *gin.Context) {
 
 	// 3. Create a new user object
 	newUser := usermodels.User{
-		ID:       primitive.NewObjectID(), // Generate a new BSON ObjectID
+		ID:       primitive.NewObjectID(),
 		Username: input.Username,
 		Email:    input.Email,
-		Password: string(hashedPassword), // Use "Password", not "Password"
+		Password: string(hash), // from bcrypt
 		Mobile:   input.Mobile,
-		Avatar:   fileURL, // Initialize new Avatar field as empty
+		Avatar:   fileURL,
 	}
-
 	// 4. Insert the new user into the database
 	res, err := userCollection.InsertOne(ctx, newUser)
 	if err != nil {
