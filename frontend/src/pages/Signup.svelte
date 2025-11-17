@@ -2,7 +2,8 @@
   import { Input, Label, Button, Checkbox, A } from "flowbite-svelte";
   import FileUpload from "../components/FileUpload.svelte";
   import { CreateUser } from "./../services/createUser";
-  let newUser = $state({
+  import type { SignupForm } from "./../store/store";
+  let newUser: SignupForm = $state({
     username: "",
     email: "",
     mobile: "",
@@ -72,7 +73,8 @@
       >.
     </Checkbox>
     <Button
-      onclick={() => {
+      onclick={(e) => {
+        e.preventDefault();
         CreateUser(newUser);
       }}
       type="submit">Signup</Button

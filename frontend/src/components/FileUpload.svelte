@@ -5,6 +5,7 @@
   let fileuploadprops = {
     id: "user_avatar",
     label: "Upload file",
+    multiple: multiple,
   };
 </script>
 

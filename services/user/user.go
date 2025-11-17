@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"strings"
 
 	// "errors"
@@ -13,9 +14,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/internal/uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	// 1. THIS IS THE CORRECT IMPORT.
@@ -178,7 +179,9 @@ func CreateUser(c *gin.Context) {
 		filename := uuid.New().String() + extension
 		fileURL, err = storage.UploadFile(filename, bytes.NewReader(fileData))
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file"})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": fmt.Sprintf("Failed to upload file %s: %s", filename, err),
+			})
 			return
 		}
 		log.Println("File uploaded to S3:", fileURL)
