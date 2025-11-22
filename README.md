@@ -59,7 +59,7 @@ Want to run this *tamasha* on your local machine?
 1.  **Clone the repo:**
 
     ```bash
-    git clone https://github.com/your-username/maskbook.git
+    git clone https://github.com/mani-chand/maskbook.git
     cd maskbook
     ```
 
