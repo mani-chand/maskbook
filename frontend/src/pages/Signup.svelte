@@ -44,12 +44,18 @@
         id="phone"
         placeholder="+1 12345678"
         required
-        bind:value={newUser.password}
+        bind:value={newUser.mobile}
       />
     </div>
     <div class="mb-6">
       <Label for="password" class="mb-2">Password</Label>
-      <Input type="password" id="password" placeholder="•••••••••" required />
+      <Input
+        bind:value={newUser.password}
+        type="password"
+        id="password"
+        placeholder="•••••••••"
+        required
+      />
     </div>
     <div class="mb-6">
       <Label for="confirm_password" class="mb-2">Confirm password</Label>

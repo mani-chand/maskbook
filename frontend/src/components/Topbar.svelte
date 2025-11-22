@@ -6,6 +6,7 @@
     NavUl,
     NavHamburger,
   } from "flowbite-svelte";
+  let LoggedInUser = localStorage.getItem("user");
 </script>
 
 <Navbar
@@ -19,10 +20,13 @@
   </NavBrand>
   <NavHamburger />
   <NavUl>
-    <NavLi href="/login">Login</NavLi>
-    <NavLi href="">Logout</NavLi>
-    <NavLi href="/create">create an account</NavLi>
-    <NavLi href="/chat">chat</NavLi>
-    <NavLi href="/profile/1/">profile</NavLi>
+    {#if !LoggedInUser}
+      <NavLi href="/login">Login</NavLi>
+      <NavLi href="/create">create an account</NavLi>
+    {:else}
+      <NavLi href="">Logout</NavLi>
+      <NavLi href="/chat">chat</NavLi>
+      <NavLi href="/profile/1/">profile</NavLi>
+    {/if}
   </NavUl>
 </Navbar>

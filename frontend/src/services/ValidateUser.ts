@@ -8,7 +8,8 @@ export const ValidateUser = async (newUser: loginForm) => {
         'Accept': 'application/json',
       },
     }).then(res=>{
-        user.set(res?.data?.user)
-        console.log(user,"user logged in")
+        user.set(res?.data?.user);
+        localStorage.setItem("user", JSON.stringify(res?.data?.user));
+        window.location.assign('/');
     }).catch(err=>{console.log(err,'error')})
 }
