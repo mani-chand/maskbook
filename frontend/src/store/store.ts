@@ -35,7 +35,7 @@ export interface SignupForm {
 export interface Post {
   id: string;
   message: string;
-  fileData: FileList | null; // Optional file URL
+  fileData: string | null; // Optional file URL
   user_id: string;
   created_at: string; // Typically an ISO string
   user?: User; // Optional: Include full user details
@@ -46,7 +46,8 @@ export interface Post {
  */
 export interface NewPostForm {
   message: string;
-  fileData: FileList | null; // The FileList from the <Fileupload> component
+  fileData: File[]  | null; // The FileList from the <Fileupload> component
+  user_id:string;
 }
 
 // --- Store Definitions ---
@@ -62,7 +63,7 @@ export const posts: Writable<Post[]> = writable([]);
  */
 export const newPost: Writable<NewPostForm> = writable({
   message: "",
-  file: FileList | null,
+  file: File[]  | null,
 });
 
 /**

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { SignupForm } from './../store/store';
-
+import {fileToBase64} from './../utils/file'
 // 2. Define the payload for the API
 interface ApiPayload {
   username: string;
@@ -9,16 +9,6 @@ interface ApiPayload {
   password: string;
   fileData: string; // File is sent as a Base64 string
 }
-
-// 3. Helper function to read the file
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
-};
 
 // 4. The CreateUser function
 export const CreateUser = async (newUser: SignupForm) => {

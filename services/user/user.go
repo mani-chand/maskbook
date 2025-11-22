@@ -3,10 +3,7 @@ package user
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
-	"errors"
 	"fmt"
-	"strings"
 
 	// "errors"
 	"log"
@@ -26,6 +23,7 @@ import (
 
 	// 2. Use an alias for your models
 	usermodels "noob/models/user"
+	"noob/utils"
 )
 
 type SignupInput struct {
@@ -65,66 +63,6 @@ func ValidateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "user": existingUser})
 }
 
-// decodeBase64File is a helper function to strip the prefix
-// (e.g., "data:image/png;base64,") and decode the data.
-func decodeBase64File(dataURL string) ([]byte, error) {
-	// Find the comma
-	commaIndex := strings.Index(dataURL, ",")
-	if commaIndex == -1 {
-		return nil, errors.New("invalid base64 data URL: missing comma")
-	}
-
-	// Get the part after the comma
-	base64Data := dataURL[commaIndex+1:]
-
-	// Decode the string
-	decoded, err := base64.StdEncoding.DecodeString(base64Data)
-	if err != nil {
-		return nil, errors.New("failed to decode base64 data")
-	}
-	return decoded, nil
-}
-
-// --- HELPER FUNCTIONS ---
-
-// getMimeType parses the data URL (e.g., "data:image/png;base64,...")
-// and returns the MIME type (e.g., "image/png")
-func getMimeType(dataURL string) (string, error) {
-	// Find "data:"
-	startIndex := strings.Index(dataURL, "data:")
-	if startIndex == -1 {
-		return "", errors.New("invalid data URL: missing 'data:' prefix")
-	}
-	// Find ";base64,"
-	endIndex := strings.Index(dataURL, ";base64,")
-	if endIndex == -1 {
-		return "", errors.New("invalid data URL: missing ';base64,' separator")
-	}
-
-	// The MIME type is between "data:" and ";base64,"
-	mimeType := dataURL[startIndex+5 : endIndex]
-	return mimeType, nil
-}
-
-// mimeTypeToExtension maps a MIME type to a file extension.
-// Add any other file types you want to support here.
-func mimeTypeToExtension(mimeType string) (string, error) {
-	switch mimeType {
-	case "image/jpeg":
-		return ".jpg", nil
-	case "image/png":
-		return ".png", nil
-	case "image/gif":
-		return ".gif", nil
-	case "video/mp4":
-		return ".mp4", nil
-	case "video/quicktime":
-		return ".mov", nil
-	default:
-		return "", errors.New("unsupported file type: " + mimeType)
-	}
-}
-
 // CreateUser handles the logic for creating a new user.
 func CreateUser(c *gin.Context) {
 	// BUG FIX 1: Bind to AuthInput to get the plain-text password
@@ -162,14 +100,14 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 	if input.FileData != "" {
-		mimeType, err := getMimeType(input.FileData)
+		mimeType, err := utils.GetMimeType(input.FileData)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		// 2. Get the correct file extension (e.g., ".jpg")
-		extension, err := mimeTypeToExtension(mimeType)
+		extension, err := utils.MimeTypeToExtension(mimeType)
 		if err != nil {
 			// This means the user uploaded an unsupported file type
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -177,7 +115,7 @@ func CreateUser(c *gin.Context) {
 		}
 
 		// 3. Decode the data
-		fileData, err := decodeBase64File(input.FileData)
+		fileData, err := utils.DecodeBase64File(input.FileData)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
