@@ -34,6 +34,39 @@ type SignupInput struct {
 	FileData string `json:"fileData"`
 }
 
+// 1. Define the User Struct
+type User struct {
+	ID       primitive.ObjectID `bson:"_id" json:"id"`
+	Username string             `bson:"username" json:"username"`
+	Avatar   string             `bson:"avatar" json:"avatar"`
+}
+
+// 2. The Handler to Get All Users
+func GetAllUsers(c *gin.Context) {
+	db := database.GetDatabase()
+	userCollection := db.Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Find all users (empty filter bson.M{})
+	cursor, err := userCollection.Find(ctx, bson.M{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching users"})
+		return
+	}
+	defer cursor.Close(ctx)
+
+	// Initialize as empty slice to return [] instead of null if empty
+	users := []User{}
+
+	if err = cursor.All(ctx, &users); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error decoding users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+}
+
 // ValidateUser checks if a user's credentials are correct.
 func ValidateUser(c *gin.Context) {
 	var input usermodels.AuthInput

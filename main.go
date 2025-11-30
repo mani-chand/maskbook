@@ -57,6 +57,7 @@ func main() {
 		api.POST("/createUser", user.CreateUser)
 		api.POST("/login", user.ValidateUser)
 		api.POST("/createPost", post.Create_post)
+		api.GET("/users", user.GetAllUsers)
 		// You will add your post creation route here later
 		// e.g., api.POST("/createPost", post.CreatePost)
 	}
