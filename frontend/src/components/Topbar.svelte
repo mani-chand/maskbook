@@ -6,11 +6,11 @@
     NavUl,
     NavHamburger,
   } from "flowbite-svelte";
-  let LoggedInUser = localStorage.getItem("user");
+  let LoggedInUser = JSON.parse(localStorage.getItem("user"));
 </script>
 
 <Navbar
-  class="sticky start-0 top-0 z-20 w-full bg-white px-2 py-2.5 sm:px-4 dark:bg-gray-800"
+  class="sticky start-0 top-0 z-20 w-full bg-white px-2 py-2.5 sm:px-4 dark:bg-gray-700"
 >
   <NavBrand href="/">
     <span
@@ -26,7 +26,13 @@
     {:else}
       <NavLi href="">Logout</NavLi>
       <NavLi href="/chat">chat</NavLi>
-      <NavLi href="/profile/1/">profile</NavLi>
+      <NavLi href="/profile/{LoggedInUser?.id}/">
+        <img
+          src={LoggedInUser?.avatar}
+          alt={LoggedInUser?.username}
+          class="w-10 h-10 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-700"
+        />
+      </NavLi>
     {/if}
   </NavUl>
 </Navbar>

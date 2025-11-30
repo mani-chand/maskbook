@@ -61,11 +61,11 @@ export const posts: Writable<Post[]> = writable([]);
  * Stores the state of the "Create a Post" form.
  * We initialize it with default empty values.
  */
+// 2. Initialize the store with a VALUE, not a type
 export const newPost: Writable<NewPostForm> = writable({
   message: "",
-  file: File[]  | null,
+  file: null, // OR use [] if you want an empty array initially
 });
-
 /**
  * Stores the currently authenticated user.
  * It's conventional to use `null` if no user is logged in.
